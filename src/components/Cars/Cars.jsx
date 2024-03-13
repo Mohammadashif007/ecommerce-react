@@ -57,9 +57,13 @@ const cars = [
     },
 ];
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import { useEffect, useState } from "react";
 import Car from "./Car";
+import {
+    addToLocalStorage,
+    getLocalStorage,
+} from "../../utilities/localStorage";
 
 const Cars = () => {
     const [card, setCard] = useState([]);
@@ -73,13 +77,28 @@ const Cars = () => {
     // useEffect(() => {
     //    data();
     // }, [])
+    
 
     const addToCard = (car) => {
-        console.log(car);
         const newCard = [...card, car];
         setCard(newCard);
+        addToLocalStorage(car.id);
+
     };
 
+    useEffect(() => {
+        const storedCart = getLocalStorage();
+        const newItem = [];
+        for(const cartId of storedCart){
+            const item = cars.find(x => x.id === cartId)
+            newItem.push(item);
+
+        }
+        setCard(newItem);
+        
+    },[])
+
+    
     return (
         <div className="flex gap-5">
             <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-2  w-3/5">
@@ -90,9 +109,8 @@ const Cars = () => {
             <div className="w-4/12 bg-red-600">
                 <h1>card {card.length}</h1>
                 {card.map((item, idx) => (
-                    
                     <div key={item.id} className="flex justify-between p-6">
-                        <p>{idx+1}</p>
+                        <p>{idx + 1}</p>
                         <img width="65px" src={item.image} alt="" />
                         <p>{item.car_name}</p>
                         <p>${item.price}</p>
